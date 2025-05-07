@@ -11,5 +11,5 @@ trim_trailing_whitespace = true
 [*.md]
 trim_trailing_whitespace = false
 
-[*.{json,json.j2,yml,yml.j2}]
+[*.{json,json.j2,yaml,yml,yml.j2}]
 indent_size = 2
