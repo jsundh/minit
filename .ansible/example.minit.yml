@@ -1,0 +1,44 @@
+_roles:
+  - 1password
+  - general
+  - git
+  - fzf
+  - rust
+  - ssh
+  - zsh
+
+git_name: ""
+git_email: ""
+git_signing: "1password"
+git_signing_key_ref: "" # 1Password item UUID
+
+# Casks will only be installed on macOS
+general_homebrew_casks:
+  - docker
+  - jetbrains-toolbox
+  - rectangle
+  - visual-studio-code
+general_homebrew_formulae:
+  - btop
+  - jq
+
+omz_plugins:
+  - brew
+
+onepass_manual_prompt: true
+onepass_ssh_keys: [] # 1Password item UUIDs
+
+rust_cargo_packages: []
+
+zsh_aliases:
+  apb: "ansible-playbook"
+  ls: "gls"
+  ll: "ls -lAhvX --color=auto --group-directories-first --time-style=+'%Y-%m-%d %H:%M:%S'"
+  la: "ll"
+  k: "kubectl"
+  kdr: "kubectl drain --ignore-daemonsets --delete-emptydir-data"
+  kuc: "kubectl uncordon"
+
+zshrc_blocks: []
+zshrc_lines: []
+zshrc_path: []

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC1091
+set -e
+
+script_dir="$(dirname "$(readlink -f "$0")")"
+
+. "$script_dir/lib/utils.sh"
+
+if [ -f "$script_dir/.bootstrapped" ]; then
+    print_info "Already bootstrapped. Remove ./.bootstrapped to re-run."
+    exit 0
+fi
+
+preinit_linux() {
+    if command -v brew &> /dev/null; then
+        print_info "Homebrew already installed"
+        return
+    fi
+
+    dist_id="$(lsb_release -si)"
+    case "$dist_id" in
+        Ubuntu)
+            preinit_ubuntu
+            ;;
+        *)
+            print_error "Unsupported Linux distribution: $dist_id"
+            exit 1
+            ;;
+    esac
+}
+
+preinit_ubuntu() {
+    if ! command -v curl &> /dev/null; then
+        print_info "Installing curl..."
+        sudo apt-get update
+        sudo apt-get install -y curl
+    fi
+    if ! command -v gcc &> /dev/null; then
+        print_info "Installing build-essential..."
+        sudo apt-get update
+        sudo apt-get install -y build-essential
+    fi
+
+    print_info "Installing homebrew..."
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+}
+
+preinit_macos() {
+    if ! xcode-select --print-path &> /dev/null; then
+        print_info "Installing Xcode Command Line Tools..."
+        xcode-select --install
+        read -n 1 -s -r -p "Wait for Xcode Command Line Tools to finish installing, then press any key to continue"
+    fi
+}
+
+case "$MINIT_PLATFORM" in
+    Linux*)
+        preinit_linux
+        ;;
+    Darwin*)
+        preinit_macos
+        ;;
+    *)
+        echo "Unsupported OS: $(uname -s)"
+        exit 1
+        ;;
+esac
+
+MINIT_BREW="$MINIT_HOMEBREW_DIR/bin/brew"
+
+"$MINIT_BREW" analytics off
+"$MINIT_BREW" update -q
+
+if [ ! -f "$MINIT_UV" ]; then
+    print_info "Installing uv..."
+    "$MINIT_BREW" install uv
+fi
+
+if [ ! -f "$script_dir/myenv.yml" ]; then
+    print_info "Installing example minit.yml..."
+    cp "$script_dir/.ansible/example.minit.yml" "$script_dir/minit.yml"
+fi
+
+date +"%Y-%m-%d %H:%M:%S" > "$script_dir/.bootstrapped"

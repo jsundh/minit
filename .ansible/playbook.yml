@@ -1,0 +1,12 @@
+- name: Provision configuration
+  hosts: localhost
+  gather_facts: true
+  gather_subset: ["!all", "!min", "distribution", "env", "kernel", "user"]
+  vars:
+    homebrew_dir: "{{ (myenv_os == 'macos') | ternary('/opt/homebrew', '/home/linuxbrew/.linuxbrew') }}"
+    tmp_dir: "{{ lookup('ansible.builtin.env', 'MYENV_TMP_DIR') }}"
+  tasks:
+    - name: Include user variables
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/../minit.yml"
+      tags: always

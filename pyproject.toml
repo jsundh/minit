@@ -4,4 +4,6 @@ version = "0.1.0"
 description = "My minimal environment init"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "ansible-core>=2.18.5",
+]

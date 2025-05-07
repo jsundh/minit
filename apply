@@ -1,0 +1,57 @@
+#!/usr/bin/env sh
+# shellcheck disable=SC1091
+set -e
+
+script_dir="$(dirname "$(readlink -f "$0")")"
+git_dir="$script_dir/.git"
+state_file="$script_dir/.state"
+
+. "$script_dir/lib/utils.sh"
+
+if [ ! -f "$script_dir/.bootstrapped" ]; then
+    print_info ".bootstrapped not found. Running the bootstrap script first..."
+    sh "$script_dir/bootstrap"
+fi
+
+if ! command -v "$MINIT_UV" > /dev/null; then
+    print_error "uv executable not found at $MINIT_UV"
+    exit 1
+fi
+
+if [ -f "$state_file" ]; then
+    state_commit="$(cat "$state_file")"
+else
+    state_commit=""
+fi
+
+if git_diff_since "$git_dir" "$state_commit" "$script_dir/uv.lock"; then
+    "$MINIT_UV" --directory "$script_dir" sync
+fi
+
+. "$script_dir/.venv/bin/activate"
+
+ansible_dir="$script_dir/.ansible"
+export ANSIBLE_CALLBACK_FORMAT_PRETTY=true
+export ANSIBLE_CALLBACK_RESULT_FORMAT=yaml
+export ANSIBLE_COLLECTIONS_PATH="$ansible_dir/collections"
+export ANSIBLE_COLLECTIONS_SCAN_SYS_PATH=False
+export ANSIBLE_INVENTORY="$ansible_dir/inventory.yml"
+export ANSIBLE_INVENTORY_ENABLED="ini,yaml"
+export ANSIBLE_LOCALHOST_WARNING=False
+export ANSIBLE_ROLES_PATH="$script_dir/roles"
+
+export MINIT_TMP_DIR="$ansible_dir/tmp"
+
+if git_diff_since "$git_dir" "$state_commit" "$ansible_dir/collections.yml"; then
+    print_info "Updating Galaxy collections..."
+    ansible-galaxy collection install -Ur "$ansible_dir/collections.yml"
+fi
+
+current_commit="$(git --git-dir "$git_dir" rev-parse HEAD)"
+if [ "$current_commit" != "$state_commit" ]; then
+    print_info "Saving state..."
+    printf '%s\n' "$current_commit" > "$state_file"
+fi
+
+
+ansible-playbook "$ansible_dir/playbook.yml" "$@" ${ask_become_pass:+"--ask-become-pass"}
