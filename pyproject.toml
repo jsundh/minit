@@ -10,5 +10,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "ansible-lint>=25.4.0",
     "pre-commit>=4.2.0",
 ]

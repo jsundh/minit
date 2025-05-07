@@ -11,5 +11,7 @@ repos:
         args: [--unsafe, --allow-multiple-documents]
       - id: check-toml
       - id: end-of-file-fixer
+        exclude: >-
+          (?x)^.vscode/settings.json$
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]

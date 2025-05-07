@@ -1,0 +1,6 @@
+{
+  "ansible.validation.lint.arguments": "-x var-naming[no-role-prefix]",
+  "files.associations": {
+    "**/roles/**/*.yml": "ansible",
+  },
+}
