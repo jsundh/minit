@@ -1,0 +1,12 @@
+argument_specs:
+  main:
+    short_description: ""
+    options:
+      minit_os:
+        type: str
+        required: true
+        choices: ["linux", "macos"]
+      onepass_ssh_keys:
+        type: list
+        elements: str
+        required: false

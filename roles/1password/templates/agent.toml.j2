@@ -1,0 +1,4 @@
+{% for key in onepass_ssh_keys %}
+[[ssh-keys]]
+item = "{{ key }}"
+{% endfor %}

@@ -1,0 +1,16 @@
+# The linux setup currently assumes that 1Password has been pre-installed in a custom atomic Fedora image.
+
+- name: Ensure 1Password CLI is installed
+  ansible.builtin.command:
+    cmd: op --version
+  changed_when: false
+
+- name: Include SSH agent tasks
+  ansible.builtin.include_tasks:
+    file: "ssh-agent.yml"
+    apply:
+      tags:
+        - 1password
+        - 1password-ssh
+  tags: always
+  when: onepass_ssh_keys

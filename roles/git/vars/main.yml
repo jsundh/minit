@@ -1,0 +1,4 @@
+git_allowed_signers_file: "{{ minit_config_dir }}/allowed_signers"
+git_gpg_ssh_program:
+  linux: /opt/1Password/op-ssh-sign
+  macos: "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"

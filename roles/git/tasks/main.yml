@@ -1,0 +1,38 @@
+- name: Install git-interactive-rebase-tool
+  community.general.homebrew:
+    name: git-interactive-rebase-tool
+    state: present
+  tags: brew
+
+- name: Install difftastic
+  community.general.homebrew:
+    name: difftastic
+    state: present
+  tags: brew
+
+- name: Prepare 1Password signing configuration
+  when: "git_signing == '1password'"
+  tags: git-config
+  block:
+    - name: Get signing key from 1Password
+      ansible.builtin.set_fact:
+        git_signing_key: "{{ lookup('community.general.onepassword', git_signing_key_ref, field='public_key') }}"
+
+    - name: Ensure minit config directory exists
+      ansible.builtin.file:
+        path: "{{ minit_config_dir }}"
+        state: directory
+        mode: "755"
+
+    - name: Copy allowed_signers
+      ansible.builtin.template:
+        src: "allowed_signers.j2"
+        dest: "{{ git_allowed_signers_file }}"
+        mode: "644"
+
+- name: Copy .gitconfig
+  ansible.builtin.template:
+    src: ".gitconfig.j2"
+    dest: "{{ ansible_env.HOME }}/.gitconfig"
+    mode: "644"
+  tags: git-config

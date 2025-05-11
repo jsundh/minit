@@ -1,0 +1,2 @@
+ssh_key_name: "id_ed25519"
+ssh_use_1password: "{{ onepass_ssh_keys | default([]) | length > 0 }}"

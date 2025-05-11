@@ -2,12 +2,9 @@ all:
   vars:
     ansible_become_method: sudo
     ansible_become_user: root
-    myenv_os: >-
-      {%- if ansible_os_family == 'Windows' -%}
-      windows
-      {%- elif ansible_system == 'Linux' and ansible_kernel.endswith('WSL2') -%}
-      wsl
-      {%- elif ansible_system == 'Linux' -%}
+    minit_config_dir: "{{ ansible_env.HOME }}/.config/minit"
+    minit_os: >-
+      {%- if ansible_system == 'Linux' -%}
       linux
       {%- elif ansible_system == 'Darwin' -%}
       macos

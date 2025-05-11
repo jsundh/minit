@@ -3,10 +3,22 @@
   gather_facts: true
   gather_subset: ["!all", "!min", "distribution", "env", "kernel", "user"]
   vars:
-    homebrew_dir: "{{ (myenv_os == 'macos') | ternary('/opt/homebrew', '/home/linuxbrew/.linuxbrew') }}"
-    tmp_dir: "{{ lookup('ansible.builtin.env', 'MYENV_TMP_DIR') }}"
+    homebrew_dir: "{{ (minit_os == 'macos') | ternary('/opt/homebrew', '/home/linuxbrew/.linuxbrew') }}"
+    tmp_dir: "{{ lookup('ansible.builtin.env', 'MINIT_TMP_DIR') }}"
   tasks:
     - name: Include user variables
       ansible.builtin.include_vars:
         file: "{{ playbook_dir }}/../minit.yml"
+      tags: always
+
+    - name: Include roles
+      ansible.builtin.include_role:
+        name: "{{ role_name }}"
+        tasks_from: main.yml
+        apply:
+          tags: "{{ role_name }}"
+      loop: "{{ _roles }}"
+      loop_control:
+        loop_var: role_name
+        label: "{{ role_name }}"
       tags: always

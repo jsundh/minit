@@ -1,0 +1,12 @@
+- name: Create SSH agent config directory
+  ansible.builtin.file:
+    path: "{{ onepass_ssh_agent_config_dir }}"
+    state: directory
+    mode: "755"
+    recurse: true
+
+- name: Create SSH agent config file
+  ansible.builtin.template:
+    src: agent.toml.j2
+    dest: "{{ onepass_ssh_agent_config_dir }}/agent.toml"
+    mode: "644"

@@ -1,0 +1,1 @@
+onepass_ssh_agent_config_dir: "{{ ansible_env.HOME }}/.config/1Password/ssh-agent"

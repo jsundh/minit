@@ -76,7 +76,7 @@ if [ ! -f "$MINIT_UV" ]; then
     "$MINIT_BREW" install uv
 fi
 
-if [ ! -f "$script_dir/myenv.yml" ]; then
+if [ ! -f "$script_dir/minit.yml" ]; then
     print_info "Installing example minit.yml..."
     cp "$script_dir/.ansible/example.minit.yml" "$script_dir/minit.yml"
 fi

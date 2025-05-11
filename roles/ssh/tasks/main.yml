@@ -1,0 +1,31 @@
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: "700"
+  tags: ssh-config
+
+- name: Add ssh config
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/config"
+    block: "{{ lookup('ansible.builtin.template', 'config.j2') }}"
+    mode: "600"
+    insertbefore: BOF
+    create: true
+  tags: ssh-config
+
+- name: Stat SSH key
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.ssh/{{ ssh_key_name }}"
+  register: ssh_key_stat
+  when: not ssh_use_1password
+
+- name: Prompt user to create ssh key
+  ansible.builtin.pause:
+    prompt: |
+      SSH key {{ ansible_env.HOME }}/.ssh/{{ ssh_key_name }} does not exist.
+      Please create an SSH key using ssh-keygen
+      Then press Enter to continue.
+  when:
+    - not ssh_use_1password
+    - not ssh_key_stat.stat.exists

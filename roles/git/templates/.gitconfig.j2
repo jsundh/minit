@@ -1,0 +1,52 @@
+[alias]
+    dft = difftool
+    dlg = "-c diff.external=difft log -p --ext-diff"
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[color]
+    ui = true
+[core]
+    editor = vim
+    autocrlf = input
+[diff]
+    algorithm = histogram
+    tool = difftastic
+[difftool]
+    prompt = false
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
+[fetch]
+    prune = true
+[init]
+    defaultBranch = main
+[merge]
+    conflictstyle = diff3
+[pager]
+    difftool = true
+[push]
+    autoSetupRemote = true
+    default = simple
+[pull]
+    rebase = true
+[rebase]
+    autosquash = true
+    autostash = true
+[sequence]
+    editor = interactive-rebase-tool
+[user]
+    name = {{ git_name }}
+    email = {{ git_email }}
+
+{% if git_signing %}
+# Commit signing configuration
+[commit]
+    gpgsign = true
+[gpg]
+    format = ssh
+[gpg "ssh"]
+    allowedSignersFile = {{ git_allowed_signers_file }}
+{% if git_signing == "1password" %}
+    program = "{{ git_gpg_ssh_program[minit_os] }}"
+{% endif %}
+[user]
+    signingkey = "{{ git_signing_key }}"
+{% endif %}

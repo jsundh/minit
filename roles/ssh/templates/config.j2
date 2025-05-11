@@ -1,0 +1,11 @@
+{% if ssh_use_1password %}
+Host *
+    IdentityAgent {{ ansible_env.HOME }}/.1password/agent.sock
+{% else %}
+Host *
+    AddKeysToAgent yes
+{% if minit_os == 'macos' %}
+    UseKeychain yes
+{% endif %}
+    IdentityFile ~/.ssh/{{ ssh_key_name }}
+{% endif %}

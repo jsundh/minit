@@ -1,0 +1,36 @@
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks:
+    file: "main-{{ minit_os }}.yml"
+    apply:
+      tags:
+        - 1password
+        - 1password-os
+  tags: always
+
+- name: Prompt user to manually finish the 1Password setup
+  ansible.builtin.pause:
+    prompt: |
+      Please login to the 1Password desktop app and enable the CLI integration by following these steps:
+      https://developer.1password.com/docs/cli/get-started#step-2-turn-on-the-1password-desktop-app-integration
+
+      Then press Enter to continue.
+      This prompt can be permanently disabled by setting the variable `onepass_manual_prompt` to `false`.
+  when: onepass_manual_prompt
+
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: "700"
+  tags: 1password-pub
+
+- name: Export public keys from 1Password
+  ansible.builtin.copy:
+    content: "{{ public_key }}"
+    dest: "{{ ansible_env.HOME }}/.ssh/id_1password{{ suffix }}.pub"
+    mode: "600"
+  vars:
+    suffix: "{{ (onepass_ssh_keys | length > 1) | ternary('_' + item, '') | lower }}"
+    public_key: "{{ lookup('community.general.onepassword', item, field='public_key') }}"
+  loop: "{{ onepass_ssh_keys }}"
+  tags: 1password-pub
